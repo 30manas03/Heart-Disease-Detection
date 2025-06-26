@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Heart Disease Checkup</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 40px;
+            color: #b6b0b0;
+            background-color: #131823;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 0px;
+            box-shadow: 0 0 25px rgb(45, 45, 45);
+            background-color: #16181e;
+        }
+
+        label {
+            /* display: inline-block;
+            width: 300px;
+            margin: 10px 0;
+            padding-left: 20px; */
+            display: block;
+            margin: 10px 10px 0 10px;
+            padding-left: 5px;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        input,
+        select {
+            /* width: 250px;
+            padding: 5px;
+            background-color: #262730;
+            color: #fafafa;
+            border-color: #FF4B4B; */
+            width: calc(100% - 40px); /* full width minus padding/margin */
+            padding: 8px;
+            margin: 5px 10px 15px 10px;
+            background-color: #262730;
+            color: #b6b0b0;
+            border: 1px solid #FF4B4B;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 95%;
+            padding: 10px;
+            background-color: #FF4B4B;
+            color: black;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #1ed728;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Heart Disease Checkup</h1>
+    <form action="/predict" method="post">
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br>
+
+        <label for="sex">Sex (0: Female, 1: Male):</label>
+        <select id="sex" name="sex">
+            <option value="0">Female</option>
+            <option value="1">Male</option>
+        </select><br>
+
+        <label for="cp">Chest Pain Type (0: Typical Angina, 1: Atypical Angina, 2: Non-anginal, 3:
+            Asymptomatic):</label>
+        <select id="cp" name="cp">
+            <option value="0">Typical Angina</option>
+            <option value="1">Atypical Angina</option>
+            <option value="2">Non-anginal Pain</option>
+            <option value="3">Asymptomatic</option>
+        </select><br>
+
+        <label for="trestbps">Resting Blood Pressure (mm Hg):</label>
+        <input type="number" id="trestbps" name="trestbps" required><br>
+
+        <label for="chol">Serum Cholesterol (mg/dl):</label>
+        <input type="number" id="chol" name="chol" required><br>
+
+        <label for="fbs">Fasting Blood Sugar > 120 mg/dl (0: False, 1: True):</label>
+        <select id="fbs" name="fbs">
+            <option value="0">False</option>
+            <option value="1">True</option>
+        </select><br>
+
+        <label for="restecg">Resting ECG (0: Normal, 1: ST-T Abnormality, 2: LV Hypertrophy):</label>
+        <select id="restecg" name="restecg">
+            <option value="0">Normal</option>
+            <option value="1">ST-T Wave Abnormality</option>
+            <option value="2">Left Ventricular Hypertrophy</option>
+        </select><br>
+
+        <label for="thalach">Maximum Heart Rate Achieved:</label>
+        <input type="number" id="thalach" name="thalach" required><br>
+
+        <label for="exang">Exercise Induced Angina (0: No, 1: Yes):</label>
+        <select id="exang" name="exang">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select><br>
+
+        <label for="oldpeak">ST Depression Induced by Exercise:</label>
+        <input type="number" step="0.1" id="oldpeak" name="oldpeak" required><br>
+
+        <label for="slope">Slope of Peak Exercise ST Segment (0: Upsloping, 1: Flat, 2: Downsloping):</label>
+        <select id="slope" name="slope">
+            <option value="0">Upsloping</option>
+            <option value="1">Flat</option>
+            <option value="2">Downsloping</option>
+        </select><br>
+
+        <label for="ca">Number of Major Vessels Colored by Fluoroscopy (0-3):</label>
+        <input type="number" min="0" max="3" id="ca" name="ca" required><br>
+
+        <label for="thal">Thalassemia (0: Normal, 1: Fixed Defect, 2: Reversible Defect, 3: Not Described):</label>
+        <select id="thal" name="thal">
+            <option value="0">Normal</option>
+            <option value="1">Fixed Defect</option>
+            <option value="2">Reversible Defect</option>
+            <option value="3">Not Described</option>
+        </select><br>
+
+        <input type="submit" value="Predict">
+    </form>
+</body>
+
+</html>
