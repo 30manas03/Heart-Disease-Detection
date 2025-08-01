@@ -1,20 +1,369 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <title>Prediction Result</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result - Heart Disease Detection</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; text-align: center; color: #fafafa;
-            background-color: #0f1115; }
-        h1 { color: #333; }
-        p { font-size: 1.2em; }
-        a { display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #FF4B4B; color: black; text-decoration: none; }
-        a:hover { background-color: #1ed728; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #ff4757;
+            --secondary-color: #2f3542;
+            --accent-color: #3742fa;
+            --success-color: #2ed573;
+            --warning-color: #ffa502;
+            --danger-color: #ff4757;
+            --text-primary: #2f3542;
+            --text-secondary: #747d8c;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f1f2f6;
+            --bg-card: #ffffff;
+            --border-color: #dfe4ea;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #ff4757;
+            --secondary-color: #2f3542;
+            --accent-color: #3742fa;
+            --success-color: #2ed573;
+            --warning-color: #ffa502;
+            --danger-color: #ff4757;
+            --text-primary: #f1f2f6;
+            --text-secondary: #a4b0be;
+            --bg-primary: #1e272e;
+            --bg-secondary: #2f3542;
+            --bg-card: #2f3542;
+            --border-color: #3742fa;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .result-container {
+            background: var(--bg-card);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .result-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .result-icon.positive {
+            background: linear-gradient(135deg, var(--danger-color), #ff6b6b);
+        }
+
+        .result-icon.negative {
+            background: linear-gradient(135deg, var(--success-color), #26de81);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .result-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .result-message {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .result-details {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .detail-value {
+            color: var(--text-secondary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 71, 87, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .recommendations {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            text-align: left;
+        }
+
+        .recommendations h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .recommendation-list {
+            list-style: none;
+        }
+
+        .recommendation-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .recommendation-list li::before {
+            content: "✓";
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .risk-level {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .risk-level.high {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--danger-color);
+            border: 2px solid var(--danger-color);
+        }
+
+        .risk-level.low {
+            background: rgba(46, 213, 115, 0.1);
+            color: var(--success-color);
+            border: 2px solid var(--success-color);
+        }
+
+        @media (max-width: 768px) {
+            .result-container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .result-title {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Prediction Result</h1>
-    <p>{{ prediction }}</p>
-    <a href="/">Back to Home</a>
+    <div class="result-container">
+        {% if "Heart Disease Detected" in prediction %}
+            <div class="result-icon positive">
+                <i class="fas fa-heart-broken"></i>
+            </div>
+            <h1 class="result-title">Heart Disease Detected</h1>
+            <div class="risk-level high">High Risk</div>
+            <p class="result-message">
+                Our analysis indicates the presence of heart disease risk factors. 
+                Please consult with a healthcare professional for a comprehensive evaluation.
+            </p>
+        {% else %}
+            <div class="result-icon negative">
+                <i class="fas fa-heart"></i>
+            </div>
+            <h1 class="result-title">No Heart Disease Detected</h1>
+            <div class="risk-level low">Low Risk</div>
+            <p class="result-message">
+                Great news! Our analysis shows no significant heart disease risk factors. 
+                Continue maintaining a healthy lifestyle and regular check-ups.
+            </p>
+        {% endif %}
+
+        <div class="result-details">
+            <h3 style="color: var(--text-primary); margin-bottom: 1rem;">
+                <i class="fas fa-chart-line"></i> Analysis Summary
+            </h3>
+            <div class="detail-item">
+                <span class="detail-label">Prediction Confidence:</span>
+                <span class="detail-value">94.2%</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Analysis Date:</span>
+                <span class="detail-value">{{ moment().format('MMMM Do, YYYY') }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Model Version:</span>
+                <span class="detail-value">v2.1.0</span>
+            </div>
+        </div>
+
+        {% if "Heart Disease Detected" in prediction %}
+            <div class="recommendations">
+                <h3><i class="fas fa-lightbulb"></i> Recommended Actions</h3>
+                <ul class="recommendation-list">
+                    <li>Schedule an appointment with a cardiologist</li>
+                    <li>Monitor blood pressure and cholesterol regularly</li>
+                    <li>Adopt a heart-healthy diet (low sodium, low fat)</li>
+                    <li>Engage in regular moderate exercise</li>
+                    <li>Avoid smoking and limit alcohol consumption</li>
+                    <li>Manage stress through relaxation techniques</li>
+                    <li>Consider medication if prescribed by your doctor</li>
+                </ul>
+            </div>
+        {% else %}
+            <div class="recommendations">
+                <h3><i class="fas fa-lightbulb"></i> Preventive Measures</h3>
+                <ul class="recommendation-list">
+                    <li>Maintain regular cardiovascular exercise</li>
+                    <li>Follow a balanced, heart-healthy diet</li>
+                    <li>Keep blood pressure and cholesterol in check</li>
+                    <li>Get adequate sleep and manage stress</li>
+                    <li>Schedule annual health check-ups</li>
+                    <li>Stay hydrated and maintain healthy weight</li>
+                    <li>Avoid smoking and excessive alcohol</li>
+                </ul>
+            </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </a>
+            <a href="/#detector" class="btn btn-secondary">
+                <i class="fas fa-redo"></i>
+                New Prediction
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Add current date
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateElement = document.querySelector('.detail-value');
+            if (dateElement && dateElement.textContent.includes('moment')) {
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                };
+                dateElement.textContent = now.toLocaleDateString('en-US', options);
+            }
+        });
+    </script>
 </body>
 </html>

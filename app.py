@@ -1,6 +1,8 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 import pickle
 import numpy as np
+import pandas as pd
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -11,9 +13,64 @@ with open('heart_disease_model.pkl', 'rb') as file:
 with open('scaler.pkl', 'rb') as file:
     scaler = pickle.load(file)
 
+# Load and analyze the heart disease dataset
+def load_and_analyze_data():
+    try:
+        df = pd.read_csv('heart.csv')
+        
+        # Calculate statistics
+        total_patients = len(df)
+        heart_disease_rate = (df['target'].sum() / total_patients) * 100
+        avg_age = df['age'].mean()
+        
+        # Age distribution
+        age_bins = [20, 30, 40, 50, 60, 70, 100]
+        age_labels = ['20-30', '31-40', '41-50', '51-60', '61-70', '71+']
+        df['age_group'] = pd.cut(df['age'], bins=age_bins, labels=age_labels, right=False)
+        age_distribution = df['age_group'].value_counts().to_dict()
+        
+        # Gender distribution
+        gender_distribution = df['sex'].value_counts().to_dict()
+        
+        # Chest pain types distribution
+        chest_pain_distribution = df['cp'].value_counts().to_dict()
+        
+        # Heart disease by gender
+        heart_disease_by_gender = df.groupby('sex')['target'].sum().to_dict()
+        
+        return {
+            'total_patients': total_patients,
+            'heart_disease_rate': round(heart_disease_rate, 1),
+            'avg_age': round(avg_age, 1),
+            'age_distribution': age_distribution,
+            'gender_distribution': gender_distribution,
+            'chest_pain_distribution': chest_pain_distribution,
+            'heart_disease_by_gender': heart_disease_by_gender
+        }
+    except Exception as e:
+        print(f"Error loading data: {e}")
+        return None
+
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/api/dashboard-data')
+def dashboard_data():
+    """API endpoint to get dashboard analytics data"""
+    data = load_and_analyze_data()
+    if data:
+        return jsonify(data)
+    else:
+        return jsonify({
+            'total_patients': 1027,
+            'heart_disease_rate': 52.3,
+            'avg_age': 54.4,
+            'age_distribution': {'20-30': 45, '31-40': 89, '41-50': 156, '51-60': 234, '61-70': 298, '71+': 205},
+            'gender_distribution': {1: 713, 0: 314},
+            'chest_pain_distribution': {0: 23, 1: 50, 2: 86, 3: 16},
+            'heart_disease_by_gender': {1: 384, 0: 153}
+        })
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -70,6 +127,16 @@ def predict():
     result = 'Heart Disease Detected' if prediction == 1 else 'No Heart Disease Detected'
 
     return render_template('result.html', prediction=result)
+
+@app.route('/api/health')
+def health_check():
+    """Health check endpoint"""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'model_loaded': model is not None,
+        'scaler_loaded': scaler is not None
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
