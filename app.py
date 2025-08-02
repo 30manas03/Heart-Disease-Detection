@@ -74,59 +74,122 @@ def dashboard_data():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    # Collect input data from the form
-    age = float(request.form['age'])
-    sex = int(request.form['sex'])
-    cp = int(request.form['cp'])
-    trestbps = float(request.form['trestbps'])
-    chol = float(request.form['chol'])
-    fbs = int(request.form['fbs'])
-    restecg = int(request.form['restecg'])
-    thalach = float(request.form['thalach'])
-    exang = int(request.form['exang'])
-    oldpeak = float(request.form['oldpeak'])
-    slope = int(request.form['slope'])
-    ca = float(request.form['ca'])
-    thal = int(request.form['thal'])
+    try:
+        # Collect input data from the form
+        age = float(request.form['age'])
+        sex = int(request.form['sex'])
+        cp = int(request.form['cp'])
+        trestbps = float(request.form['trestbps'])
+        chol = float(request.form['chol'])
+        fbs = int(request.form['fbs'])
+        restecg = int(request.form['restecg'])
+        thalach = float(request.form['thalach'])
+        exang = int(request.form['exang'])
+        oldpeak = float(request.form['oldpeak'])
+        slope = int(request.form['slope'])
+        ca = float(request.form['ca'])
+        thal = int(request.form['thal'])
 
-    # Perform one-hot encoding for categorical variables
-    # cp: 0,1,2,3 -> cp_1, cp_2, cp_3 (cp_0 dropped)
-    cp_1, cp_2, cp_3 = [1 if cp == i else 0 for i in [1, 2, 3]]
-    # restecg: 0,1,2 -> restecg_1, restecg_2 (restecg_0 dropped)
-    restecg_1, restecg_2 = [1 if restecg == i else 0 for i in [1, 2]]
-    # slope: 0,1,2 -> slope_1, slope_2 (slope_0 dropped)
-    slope_1, slope_2 = [1 if slope == i else 0 for i in [1, 2]]
-    # thal: 0,1,2,3 -> thal_1, thal_2, thal_3 (thal_0 dropped)
-    thal_1, thal_2, thal_3 = [1 if thal == i else 0 for i in [1, 2, 3]]
+        # Get the current theme from the form
+        current_theme = request.form.get('current_theme', 'light')
 
-    # Standardize numerical features
-    numerical_features = [age, trestbps, chol, thalach, oldpeak, ca]
-    standardized_numerical = scaler.transform([numerical_features])[0]
+        # --- PREPROCESSING ---
 
-    # Construct the input array in the order expected by the model
-    input_array = [
-        standardized_numerical[0],  # age
-        sex,                       # sex
-        standardized_numerical[1],  # trestbps
-        standardized_numerical[2],  # chol
-        fbs,                       # fbs
-        standardized_numerical[3],  # thalach
-        exang,                     # exang
-        standardized_numerical[4],  # oldpeak
-        standardized_numerical[5],  # ca
-        cp_1, cp_2, cp_3,          # cp one-hot encoded
-        restecg_1, restecg_2,      # restecg one-hot encoded
-        slope_1, slope_2,          # slope one-hot encoded
-        thal_1, thal_2, thal_3     # thal one-hot encoded
-    ]
+        # 1. Standardize numerical features
+        numerical_features = [age, trestbps, chol, thalach, oldpeak, ca]
+        standardized_numerical = scaler.transform([numerical_features])
 
-    # Make prediction
-    prediction = model.predict([input_array])[0]
+        # 2. One-hot encode categorical features
+        cp_ohe = [1 if cp == i else 0 for i in [1, 2, 3]]
+        restecg_ohe = [1 if restecg == i else 0 for i in [1, 2]]
+        slope_ohe = [1 if slope == i else 0 for i in [1, 2]]
+        thal_ohe = [1 if thal == i else 0 for i in [1, 2, 3]]
+        
+        # 3. List the other raw (non-scaled, non-ohe) features
+        raw_features = [sex, fbs, exang]
 
-    # Interpret the prediction
-    result = 'Heart Disease Detected' if prediction == 1 else 'No Heart Disease Detected'
+        # --- ASSEMBLE FINAL FEATURE VECTOR ---
+        # The order must EXACTLY match the training data:
+        # Scaled -> Raw -> One-Hot-Encoded
+        
+        input_list = np.concatenate([
+            standardized_numerical[0], # Scaled numerical features
+            raw_features,              # Raw features
+            cp_ohe,                    # OHE features for 'cp'
+            restecg_ohe,               # OHE features for 'restecg'
+            slope_ohe,                 # OHE features for 'slope'
+            thal_ohe                   # OHE features for 'thal'
+        ]).tolist()
 
-    return render_template('result.html', prediction=result)
+        # --- MAKE PREDICTION ---
+        
+        # The model expects a 2D array, so we wrap our list in another list
+        prediction = model.predict([input_list])[0]
+
+        # Interpret the prediction
+        result = 'Heart Disease Detected' if prediction == 1 else 'No Heart Disease Detected'
+        print(result)
+        return render_template('result.html', prediction=result, current_theme=current_theme)
+
+    except Exception as e:
+        # Return an error message if anything goes wrong
+        return render_template('result.html', prediction=f"An error occurred: {e}", current_theme='light')
+
+
+
+    # # Collect input data from the form
+    # age = float(request.form['age'])
+    # sex = int(request.form['sex'])
+    # cp = int(request.form['cp'])
+    # trestbps = float(request.form['trestbps'])
+    # chol = float(request.form['chol'])
+    # fbs = int(request.form['fbs'])
+    # restecg = int(request.form['restecg'])
+    # thalach = float(request.form['thalach'])
+    # exang = int(request.form['exang'])
+    # oldpeak = float(request.form['oldpeak'])
+    # slope = int(request.form['slope'])
+    # ca = float(request.form['ca'])
+    # thal = int(request.form['thal'])
+
+    # # Perform one-hot encoding for categorical variables
+    # # cp: 0,1,2,3 -> cp_1, cp_2, cp_3 (cp_0 dropped)
+    # cp_1, cp_2, cp_3 = [1 if cp == i else 0 for i in [1, 2, 3]]
+    # # restecg: 0,1,2 -> restecg_1, restecg_2 (restecg_0 dropped)
+    # restecg_1, restecg_2 = [1 if restecg == i else 0 for i in [1, 2]]
+    # # slope: 0,1,2 -> slope_1, slope_2 (slope_0 dropped)
+    # slope_1, slope_2 = [1 if slope == i else 0 for i in [1, 2]]
+    # # thal: 0,1,2,3 -> thal_1, thal_2, thal_3 (thal_0 dropped)
+    # thal_1, thal_2, thal_3 = [1 if thal == i else 0 for i in [1, 2, 3]]
+
+    # # Standardize numerical features
+    # numerical_features = [age, trestbps, chol, thalach, oldpeak, ca]
+    # standardized_numerical = scaler.transform([numerical_features])[0]
+
+    # # Construct the input array in the order expected by the model
+    # input_array = [
+    #     standardized_numerical[0],  # age
+    #     sex,                       # sex
+    #     standardized_numerical[1],  # trestbps
+    #     standardized_numerical[2],  # chol
+    #     fbs,                       # fbs
+    #     standardized_numerical[3],  # thalach
+    #     exang,                     # exang
+    #     standardized_numerical[4],  # oldpeak
+    #     standardized_numerical[5],  # ca
+    #     cp_1, cp_2, cp_3,          # cp one-hot encoded
+    #     restecg_1, restecg_2,      # restecg one-hot encoded
+    #     slope_1, slope_2,          # slope one-hot encoded
+    #     thal_1, thal_2, thal_3     # thal one-hot encoded
+    # ]
+
+    # # Make prediction
+    # prediction = model.predict([input_array])[0]
+
+    # # Interpret the prediction
+    # result = 'Heart Disease Detected' if prediction == 1 else 'No Heart Disease Detected'
+
+    # return render_template('result.html', prediction=result)
 
 @app.route('/api/health')
 def health_check():

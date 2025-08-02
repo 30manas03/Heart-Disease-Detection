@@ -836,6 +836,7 @@
 
             <div class="form-container">
                 <form action="/predict" method="post" id="prediction-form">
+                    <input type="hidden" name="current_theme" id="current-theme-input" value="light">
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label" for="age">Age (years)</label>
@@ -955,7 +956,7 @@
             <div class="profile-container">
                 <div class="profile-header">
                     <div class="profile-avatar floating-animation">
-                        <i class="fas fa-user"></i>
+                        <img src="{{ url_for('static', filename='images/profile.jpg') }}" alt="Developer Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     </div>
                     <h3 class="profile-name">Manas Nayak</h3>
                     <p class="profile-role">AI/ML Engineer</p>
@@ -1032,6 +1033,9 @@
                     </h3>
                     <div class="about-content">
                         <p>Our advanced AI-powered system provides accurate cardiovascular risk assessment using machine learning algorithms trained on comprehensive medical datasets.</p>
+                        <div style="margin-top: 1rem; text-align: center;">
+                            <img src="{{ url_for('static', filename='images/Medicine-person-holding-red-heart-model-and-futuristic-icon-medical-network-connection-with-virtual-screen-shutterstock_686402860.jpg') }}" alt="AI Heart Disease Detection" style="width: 100%; max-width: 400px; height: auto; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        </div>
                     </div>
                 </div>
 
@@ -1049,6 +1053,9 @@
                             <li>ECG and stress test results</li>
                             <li>Exercise-induced symptoms</li>
                         </ul>
+                        <div style="margin-top: 1rem; text-align: center;">
+                            <img src="{{ url_for('static', filename='images/covid-19-heart-care-640x410.jpg') }}" alt="Heart Care Process" style="width: 100%; max-width: 400px; height: auto; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        </div>
                     </div>
                 </div>
 
@@ -1066,6 +1073,9 @@
                             <li>User-friendly interface</li>
                             <li>Evidence-based results</li>
                         </ul>
+                        <div style="margin-top: 1rem; text-align: center;">
+                            <img src="{{ url_for('static', filename='images/risk-factors-for-heart-disease.webp') }}" alt="Heart Disease Risk Factors" style="width: 100%; max-width: 400px; height: auto; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        </div>
                     </div>
                 </div>
 
@@ -1082,6 +1092,9 @@
                             <li>Regular security audits</li>
                             <li>Anonymous processing</li>
                         </ul>
+                        <div style="margin-top: 1rem; text-align: center;">
+                            <img src="{{ url_for('static', filename='images/shutterstock_1303927084.jpg') }}" alt="Medical Technology Security" style="width: 100%; max-width: 400px; height: auto; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1094,15 +1107,18 @@
             const html = document.documentElement;
             const themeIcon = document.getElementById('theme-icon');
             const themeText = document.getElementById('theme-text');
+            const themeInput = document.getElementById('current-theme-input');
             
             if (html.getAttribute('data-theme') === 'light') {
                 html.setAttribute('data-theme', 'dark');
                 themeIcon.className = 'fas fa-sun';
                 themeText.textContent = 'Light';
+                themeInput.value = 'dark';
             } else {
                 html.setAttribute('data-theme', 'light');
                 themeIcon.className = 'fas fa-moon';
                 themeText.textContent = 'Dark';
+                themeInput.value = 'light';
             }
         }
 

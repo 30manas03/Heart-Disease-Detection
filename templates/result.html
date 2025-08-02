@@ -1,11 +1,14 @@
+
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="{{ current_theme }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prediction Result - Heart Disease Detection</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -109,6 +112,7 @@
                 opacity: 0;
                 transform: translateY(20px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -138,10 +142,13 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
                 box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
             }
+
             50% {
                 transform: scale(1.05);
                 box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
@@ -305,6 +312,33 @@
             background-clip: text;
         }
 
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            z-index: 10;
+        }
+
+        .theme-toggle-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
         @media (max-width: 768px) {
             .result-container {
                 padding: 1.5rem;
@@ -326,42 +360,47 @@
         }
     </style>
 </head>
+
 <body>
     <div class="result-container">
-        {% if "Heart Disease Detected" in prediction %}
-            <div class="result-icon positive">
-                <i class="fas fa-heart-broken"></i>
-            </div>
-            <h1 class="result-title">
-                <span class="gradient-text">Heart Disease Detected</span>
-            </h1>
-            <div class="risk-level high">High Risk</div>
-            <p class="result-message">
-                Our AI analysis indicates potential heart disease risk factors. 
-                Please consult with a healthcare professional for comprehensive evaluation.
-            </p>
+        <!-- Theme Toggle Button -->
+        <button class="theme-toggle-btn" onclick="toggleTheme()">
+            <i class="fas fa-moon" id="theme-icon"></i>
+            <span id="theme-text">Dark</span>
+        </button>
+
+        <!-- CORRECTED: This condition now checks for an exact match -->
+        {% if prediction == "Heart Disease Detected" %}
+        <div class="result-icon positive">
+            <i class="fas fa-heart-broken"></i>
+        </div>
+        <h1 class="result-title">
+            <span class="gradient-text">{{ prediction }}</span>
+        </h1>
+        <div class="risk-level high">High Risk</div>
+        <p class="result-message">
+            Our AI analysis indicates potential heart disease risk factors.
+            Please consult with a healthcare professional for comprehensive evaluation.
+        </p>
         {% else %}
-            <div class="result-icon negative">
-                <i class="fas fa-heart"></i>
-            </div>
-            <h1 class="result-title">
-                <span class="gradient-text">No Heart Disease Detected</span>
-            </h1>
-            <div class="risk-level low">Low Risk</div>
-            <p class="result-message">
-                Excellent news! Our analysis shows no significant heart disease risk factors. 
-                Continue maintaining your healthy lifestyle.
-            </p>
+        <div class="result-icon negative">
+            <i class="fas fa-heart"></i>
+        </div>
+        <h1 class="result-title">
+            <span class="gradient-text">{{ prediction }}</span>
+        </h1>
+        <div class="risk-level low">Low Risk</div>
+        <p class="result-message">
+            Excellent news! Our analysis shows no significant heart disease risk factors.
+            Continue maintaining your healthy lifestyle.
+        </p>
         {% endif %}
 
         <div class="result-details">
             <h3 style="color: var(--text-primary); margin-bottom: 0.75rem; font-size: 0.875rem; font-weight: 600;">
                 <i class="fas fa-chart-line"></i> Analysis Summary
             </h3>
-            <div class="detail-item">
-                <span class="detail-label">Confidence:</span>
-                <span class="detail-value">94.2%</span>
-            </div>
+            <!-- REMOVED: The hardcoded confidence level -->
             <div class="detail-item">
                 <span class="detail-label">Analysis Date:</span>
                 <span class="detail-value" id="analysis-date">Today</span>
@@ -372,30 +411,31 @@
             </div>
         </div>
 
-        {% if "Heart Disease Detected" in prediction %}
-            <div class="recommendations">
-                <h3><i class="fas fa-lightbulb"></i> Recommended Actions</h3>
-                <ul class="recommendation-list">
-                    <li>Schedule appointment with cardiologist</li>
-                    <li>Monitor blood pressure regularly</li>
-                    <li>Adopt heart-healthy diet</li>
-                    <li>Engage in moderate exercise</li>
-                    <li>Avoid smoking and limit alcohol</li>
-                    <li>Manage stress effectively</li>
-                </ul>
-            </div>
+        <!-- CORRECTED: This condition also checks for an exact match -->
+        {% if prediction == "Heart Disease Detected" %}
+        <div class="recommendations">
+            <h3><i class="fas fa-lightbulb"></i> Recommended Actions</h3>
+            <ul class="recommendation-list">
+                <li>Schedule appointment with cardiologist</li>
+                <li>Monitor blood pressure regularly</li>
+                <li>Adopt heart-healthy diet</li>
+                <li>Engage in moderate exercise</li>
+                <li>Avoid smoking and limit alcohol</li>
+                <li>Manage stress effectively</li>
+            </ul>
+        </div>
         {% else %}
-            <div class="recommendations">
-                <h3><i class="fas fa-shield-alt"></i> Preventive Measures</h3>
-                <ul class="recommendation-list">
-                    <li>Maintain regular exercise routine</li>
-                    <li>Follow balanced, heart-healthy diet</li>
-                    <li>Monitor blood pressure and cholesterol</li>
-                    <li>Get adequate sleep and manage stress</li>
-                    <li>Schedule annual health check-ups</li>
-                    <li>Stay hydrated and maintain healthy weight</li>
-                </ul>
-            </div>
+        <div class="recommendations">
+            <h3><i class="fas fa-shield-alt"></i> Preventive Measures</h3>
+            <ul class="recommendation-list">
+                <li>Maintain regular exercise routine</li>
+                <li>Follow balanced, heart-healthy diet</li>
+                <li>Monitor blood pressure and cholesterol</li>
+                <li>Get adequate sleep and manage stress</li>
+                <li>Schedule annual health check-ups</li>
+                <li>Stay hydrated and maintain healthy weight</li>
+            </ul>
+        </div>
         {% endif %}
 
         <div class="action-buttons">
@@ -411,16 +451,49 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (html.getAttribute('data-theme') === 'light') {
+                html.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Light';
+            } else {
+                html.setAttribute('data-theme', 'light');
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = 'Dark';
+            }
+        }
+
+        // Initialize theme icon and text based on current theme
+        document.addEventListener('DOMContentLoaded', function () {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            // Set initial theme icon and text
+            if (html.getAttribute('data-theme') === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+                themeText.textContent = 'Light';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+                themeText.textContent = 'Dark';
+            }
+
+            // Set analysis date
             const dateElement = document.getElementById('analysis-date');
             const now = new Date();
-            const options = { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
             };
             dateElement.textContent = now.toLocaleDateString('en-US', options);
         });
     </script>
 </body>
+
 </html>
